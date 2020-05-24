@@ -1,0 +1,112 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  The turtle calculator, a dummy slow calculator for comprehensive code example
+
+Parameters:
+  SwaggerS3File:
+    Description: '"openapi.yaml" file location'
+    Default: ./openapi.yaml
+    Type: String
+
+Globals:
+  Function:
+    Runtime: nodejs12.x
+    Timeout: 30
+    MemorySize: 256
+
+Resources:
+  LambdaRoleForRuleExecution:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${AWS::StackName}-lambda-role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: lambda.amazonaws.com
+      Policies:
+        - PolicyName: WriteCloudWatchLogs
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: arn:aws:logs:*:*:*
+
+  Api:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: calculator
+      Name: !Sub ${AWS::StackName}-api
+      DefinitionBody:
+        'Fn::Transform':
+          Name: AWS::Include
+          Parameters:
+            Location: !Ref SwaggerS3File
+
+  Addition:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist
+      Handler: index.addition
+      Role: !GetAtt LambdaRoleForRuleExecution.Arn
+      Events:
+        Proxy:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /addition/{number1}/{number2}
+            Method: post
+
+  Subtraction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist
+      Handler: index.subtraction
+      Role: !GetAtt LambdaRoleForRuleExecution.Arn
+      Events:
+        Proxy:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /subtraction/{number1}/{number2}
+            Method: post
+
+  Multiplication:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist
+      Handler: index.multiplication
+      Role: !GetAtt LambdaRoleForRuleExecution.Arn
+      Events:
+        Proxy:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /multiplication/{number1}/{number2}
+            Method: post
+
+  Division:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist
+      Handler: index.division
+      Role: !GetAtt LambdaRoleForRuleExecution.Arn
+      Events:
+        Proxy:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /division/{number1}/{number2}
+            Method: post
+
+Outputs:
+  ApiUrl:
+    Description: API URL
+    Value: !Sub https://${Api}.execute-api.${AWS::Region}.amazonaws.com/calculator

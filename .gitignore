@@ -1,0 +1,35 @@
+
+# Created by https://www.gitignore.io/api/osx,node,linux,windows
+
+### Linux ###
+*~
+
+.idea
+
+packaged.yaml
+
+build
+dist
+
+node_modules/
+
+/libs/**/*.js
+/libs/**/*.js.map
+
+# Optional npm cache directory
+.npm
+
+# dotenv environment variables file
+.env
+.env.*
+!.env.template
+
+### OSX ###
+*.DS_Store
+.AppleDouble
+.LSOverride
+
+# logs
+*.log
+
+deploy.*.sh

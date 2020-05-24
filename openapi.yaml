@@ -1,0 +1,216 @@
+openapi: 3.0.1
+info:
+  title: Api Mocker
+  description: Automated testing application for TGR
+  contact:
+    name: Patagonia-IT
+    url: http://www.patagonia-it.com
+    email: contacto@patagonia-it.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+
+x-amazon-apigateway-request-validators:
+  body:
+    validateRequestParameters: false
+    validateRequestBody: true
+  params:
+    validateRequestParameters: true
+    validateRequestBody: false
+  all:
+    validateRequestParameters: true
+    validateRequestBody: true
+
+x-amazon-apigateway-request-validator: params
+
+paths:
+  /addition/{number1}/{number2}:
+    post:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Addition.Arn}/invocations
+        httpMethod: POST
+        type: aws
+        requestTemplates:
+          application/json: |
+            {
+              "number1": $input.params().path.get('number1'),
+              "number2": $input.params().path.get('number2')
+            }
+        responses:
+          default:
+            statusCode: 200
+            schema:
+              $ref: '#/components/schemas/Result'
+      summary: 2 numbers addition
+      parameters:
+        - name: number1
+          in: path
+          description: the first number
+          required: true
+          schema:
+            type: number
+        - name: number2
+          in: path
+          description: the second number
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          $ref: '#/components/responses/200Result'
+
+  /subtraction/{number1}/{number2}:
+    post:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Subtraction.Arn}/invocations
+        httpMethod: POST
+        type: aws
+        requestTemplates:
+          application/json: |
+            {
+              "number1": $input.params().path.get('number1'),
+              "number2": $input.params().path.get('number2')
+            }
+        responses:
+          default:
+            statusCode: 200
+            schema:
+              $ref: '#/components/schemas/Result'
+      summary: 2 numbers addition
+      parameters:
+        - name: number1
+          in: path
+          description: the first number
+          required: true
+          schema:
+            type: number
+        - name: number2
+          in: path
+          description: the second number
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          $ref: '#/components/responses/200Result'
+
+  /multiplication/{number1}/{number2}:
+    post:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Multiplication.Arn}/invocations
+        httpMethod: POST
+        type: aws
+        requestTemplates:
+          application/json: |
+            {
+              "number1": $input.params().path.get('number1'),
+              "number2": $input.params().path.get('number2')
+            }
+        responses:
+          default:
+            statusCode: 200
+            schema:
+              $ref: '#/components/schemas/Result'
+      summary: 2 numbers addition
+      parameters:
+        - name: number1
+          in: path
+          description: the first number
+          required: true
+          schema:
+            type: number
+        - name: number2
+          in: path
+          description: the second number
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          $ref: '#/components/responses/200Result'
+
+  /division/{number1}/{number2}:
+    post:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Division.Arn}/invocations
+        httpMethod: POST
+        type: aws
+        requestTemplates:
+          application/json: |
+            {
+              "number1": $input.params().path.get('number1'),
+              "number2": $input.params().path.get('number2')
+            }
+        responses:
+          default:
+            statusCode: 200
+            schema:
+              $ref: '#/components/schemas/Result'
+          DIVISION_BY_0:
+            statusCode: 409
+            schema:
+              application/json: |
+                {
+                  "code": "DIVISION_BY_0",
+                  "message": "number2 can't be zero"
+                }
+      summary: 2 numbers division
+      parameters:
+        - name: number1
+          in: path
+          description: the first number
+          required: true
+          schema:
+            type: number
+        - name: number2
+          in: path
+          description: the second number
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          $ref: '#/components/responses/200Result'
+        409:
+          $ref: '#/components/responses/Error'
+
+components:
+  schemas:
+    Result:
+      title: Result
+      type: object
+      properties:
+        result:
+          type: number
+      required:
+        - result
+    Error:
+      title: Error
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+
+  responses:
+    200Result:
+      description: Result response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Result'
+    Error:
+      description: Error response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
