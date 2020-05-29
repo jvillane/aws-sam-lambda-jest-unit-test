@@ -15,6 +15,7 @@ export const addition: BinaryOperationHandler = async ({number1, number2}, conte
   const result = await apply(additionFn, number1, number2);
   callback(null, {result});
 }
+
 export const subtraction: BinaryOperationHandler = async ({number1, number2}, context, callback) => {
   const result = await apply(subtractionFn, number1, number2);
   callback(null, {result});

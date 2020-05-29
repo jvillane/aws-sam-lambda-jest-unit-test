@@ -3,9 +3,8 @@ info:
   title: Api Mocker
   description: Automated testing application for TGR
   contact:
-    name: Patagonia-IT
-    url: http://www.patagonia-it.com
-    email: contacto@patagonia-it.com
+    name: Julio Villane
+    email: jvillane+github@gmail.com
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
